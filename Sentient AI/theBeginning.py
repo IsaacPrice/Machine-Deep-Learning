@@ -1,58 +1,35 @@
 import tensorflow as tf
 from tensorflow import keras
-from tensorflow.keras import layers
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Dropout, Activation, Flatten, LSTM
-import pandas as pd
-
-# This program will read a text prompt (in this case a IMDB review) and try to understand if it is positive or negative
-
-# Load the data
-df = pd.read_csv('Sentient AI/IMDB_Dataset.csv')
-
-# Change the sentiment column to 0 or 1
-df['sentiment'] = df['sentiment'].apply(lambda x: 1 if x == 'positive' else 0)
-
-# Remove the <br /> tags
-df['review'] = df['review'].str.replace('<br />', '')
-
-# Tokenize the data for the review column
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
+import openpyxl
+import pandas as pd
 
-# Create the tokenizer
-tokenizer = Tokenizer(num_words=10000000, oov_token='<OOV>')
-tokenizer.fit_on_texts(df['review'])
+# This program will read the labeled data from the file labaledText.xlxx and train a model to predict the sentiment of a comment
 
-# Create the sequences
-sequences = tokenizer.texts_to_sequences(df['review'])
+# Read the data
+data = pd.read_excel('Sentient AI/labeledText.xlsx')
 
-# Pad the sequences
-padded_sequences = pad_sequences(sequences, maxlen=100, truncating='post')
+# Get rid of the File Name column
+data = data.drop(['File Name'], axis=1)
 
-# Split the data into X and y
-X = padded_sequences
-y = df['sentiment']
+# Change the labels to 0, 1, 2 for negative, neutral, positive
+data['LABEL'] = data['LABEL'].replace(['Negative'], 0)
+data['LABEL'] = data['LABEL'].replace(['Neutral'], 1)
+data['LABEL'] = data['LABEL'].replace(['Positive'], 2)
 
-# Split the data into train and test sets using sklearn
-from sklearn.model_selection import train_test_split
+# Get rid of any hastags from the comments
+data['Caption'] = data['Caption'].str.replace('#', '')
 
-X_train, X_test, y_train, y_test = train_test_split(X, y)
+# Change any words with the @ in it to 'user' to remove any usernames
+def replace_at_mentions(text):
+    return ' '.join(['user' if '@' in word else word for word in text.split()])
 
-# Create the model
-model = Sequential([
-    tf.keras.layers.Embedding(10000000, 16, input_length=100),
-    tf.keras.layers.LSTM(64, return_sequences=True),
-    tf.keras.layers.LSTM(32),
-    tf.keras.layers.Dense(64, activation='relu'),
-    tf.keras.layers.Dense(2, activation='softmax')
-])
+data['Caption'] = data['Caption'].apply(replace_at_mentions)
+print (data.head())
 
-# Compile the model
-model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+# Tokenize the data
+tokenizer = Tokenizer(num_words=10000, oov_token='<OOV>')
+tokenizer.fit_on_texts(data['Caption'])
 
-# Train the model
-model.fit(X_train, y_train, epochs=10, validation_data=(X_test, y_test))
-
-# Evaluate the model
-model.evaluate(X_test, y_test)
