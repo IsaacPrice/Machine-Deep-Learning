@@ -27,6 +27,6 @@ while True:
     prediction = model.predict(padded_sequences)
     
     if prediction >= 0.5:
-        print("The text appears to be positive!", str(prediction * 100) + "%")
+        print("The text is positive", str(prediction[0][0] * 100) + "%")
     else:
-        print("The text appears to be negative!", str(prediction * 100) + "%")
+        print("The text is negative", str(prediction[0][0] * 100) + "%")
