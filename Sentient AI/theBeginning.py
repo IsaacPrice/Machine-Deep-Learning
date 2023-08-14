@@ -3,13 +3,12 @@ from tensorflow import keras
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
-import openpyxl
 import pandas as pd
 
 # This program will read the labeled data from the file labaledText.xlxx and train a model to predict the sentiment of a comment
 
 # Read the data
-data = pd.read_excel('Sentient AI/labeledText.xlsx')
+data = pd.read_csv('Sentient AI/LabeledText.csv')
 
 # Get rid of the File Name column
 data = data.drop(['File Name'], axis=1)
@@ -28,8 +27,12 @@ data['Caption'] = data['Caption'].apply(replace_at_mentions)
 print (data.head())
 
 # Tokenize the data
-tokenizer = Tokenizer(num_words=10000000, oov_token='<OOV>')
+tokenizer = Tokenizer(num_words=20000, oov_token='<OOV>')
 tokenizer.fit_on_texts(data['Caption'])
+
+import pickle
+with open('tokenizer_pickle', 'wb') as f:
+    pickle.dump(tokenizer, f) 
 
 # Get the word index
 word_index = tokenizer.word_index
@@ -48,17 +51,22 @@ testing_padded = pad_sequences(testing_sequences, maxlen=100, padding='post', tr
 # Create the labels
 training_labels = y_train.to_numpy()
 
-# Create the model
+# Create the model for regression
 model = Sequential()
-model.add(keras.layers.Embedding(10000000, 16, input_length=100))
+model.add(keras.layers.Embedding(10000, 16, input_length=100))  # Adjust num_words here
 model.add(keras.layers.GlobalAveragePooling1D())
 model.add(keras.layers.Dense(16, activation='relu'))
-model.add(keras.layers.Dense(3, activation='softmax'))
+model.add(keras.layers.Dense(1, activation='linear'))  # Single output neuron for regression
 
-model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+# Compile the model using mean squared error loss
+model.compile(loss='mean_squared_error', optimizer='adam', metrics=['accuracy'])
+
+# Convert the labels to float if they are not already
+training_labels = y_train.astype(float)
 
 # Train the model
-history = model.fit(training_padded, training_labels, epochs=30, verbose=1)
+batch_size = int(len(training_padded) * 0.25)
+history = model.fit(training_padded, training_labels, batch_size=4, epochs=30, verbose=1)
 
 # Save the model
 model.save('Sentient AI/sentimentModel.h5')
