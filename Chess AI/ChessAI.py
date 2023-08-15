@@ -1,7 +1,7 @@
 import pandas as pd
 from io import StringIO
-import chess.pgn
 import chess
+import chess.pgn
 
 # This will read the data of the chess games and train a model to predict the best move
 
@@ -12,9 +12,6 @@ data = pd.read_csv('Chess AI/temp.csv')
 useful_data = ['TimeControl', 'Termination', 'AN']
 X = data[useful_data]
 y = data['Result']
-
-print(X.head(3))
-print(y.head(3))
 
 # This will take the movetext and turn it into a list of chess boards after the movement
 def get_boards_from_movetext(chess_data_string):
@@ -39,3 +36,8 @@ def get_boards_from_movetext(chess_data_string):
 
     return boards
 
+X = X.assign(Boards = X['AN'].apply(get_boards_from_movetext))
+X = X.drop('AN', axis='columns')
+
+# Calculate how trustworthy the win is based on rank, termination, and how long the game lasted % to how much is avalible
+def calculate_win_score(white_rank, black_rank, time, termination, result):
