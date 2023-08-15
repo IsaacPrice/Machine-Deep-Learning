@@ -1,8 +1,8 @@
 import pickle
-import chess
-import chess.pgn
 import pandas as pd
 from io import StringIO
+import chess
+import chess.pgn
 
 # This will read the data of the chess games and train a model to predict the best move
 
