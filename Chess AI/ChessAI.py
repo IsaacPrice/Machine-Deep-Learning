@@ -1,17 +1,19 @@
-import pandas as pd
-from io import StringIO
+import pickle
 import chess
 import chess.pgn
+import pandas as pd
+from io import StringIO
 
 # This will read the data of the chess games and train a model to predict the best move
 
 # Read the data (cut the data down to 1000 lines for testing purposes)
-data = pd.read_csv('Chess AI/temp.csv')
+data = pd.read_csv('Chess AI/Data/temp.csv')
 
 # Extract the userful data into X and y
 useful_data = ['TimeControl', 'Termination', 'AN']
 X = data[useful_data]
-y = data['Result']
+# Load the pickle that has the y values
+y = pickle.load(open('Chess AI/Data/y_values.p', 'rb'))
 
 # This will take the movetext and turn it into a list of chess boards after the movement
 def get_boards_from_movetext(chess_data_string):
@@ -40,4 +42,3 @@ X = X.assign(Boards = X['AN'].apply(get_boards_from_movetext))
 X = X.drop('AN', axis='columns')
 
 # Calculate how trustworthy the win is based on rank, termination, and how long the game lasted % to how much is avalible
-def calculate_win_score(white_rank, black_rank, time, termination, result):
