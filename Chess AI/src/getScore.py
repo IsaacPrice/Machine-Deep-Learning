@@ -70,3 +70,4 @@ print(X['WinScore'].nsmallest(5))
 # Save the data to a pickle file
 import pickle
 pickle.dump(X, open('Chess AI/y_values.pkl', 'wb'))
+
