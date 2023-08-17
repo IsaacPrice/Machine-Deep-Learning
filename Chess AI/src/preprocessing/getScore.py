@@ -41,7 +41,7 @@ def result_score(result):
 # Run the result score function on the result column
 y = y.apply(result_score)
 
-# will take the wins, and adds them to the X dataframe if it won
+# This will take the wins, and adds them to the X dataframe if it won
 X['WhiteWin'] = y
 X['BlackWin'] = 1 - y
 
@@ -69,5 +69,5 @@ print(X['WinScore'].nsmallest(5))
 
 # Save the data to a pickle file
 import pickle
-pickle.dump(X, open('Chess AI/y_values.pkl', 'wb'))
+pickle.dump(X, open('Chess AI/data/pre-processed variables/scores', 'wb'))
 

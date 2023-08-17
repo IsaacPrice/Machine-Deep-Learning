@@ -5,7 +5,7 @@ import chess
 import chess.pgn
 from supportFunctions import *
 
-# This program will take in the data as a csv file, and then turn it into data that can be fed into the AI directly. This will be stored as a pickle file.
+# This program will take in the data as a csv file, and then turn it into data that can be fed into the AI directly. This will be stored as a pickle file. 
 
 # This will read the file that should contain all of the data of the moves
 data = pd.read_csv('Chess AI/data/files/temp.csv')
@@ -26,6 +26,7 @@ for i in range(len(data)):
     X.append(temp_X)
     y.append(temp_y)
 
-# print some values
-print(X[0][0][0])
-print(y[0][0])
+# Load the score values from pickle
+scores = pickle.load(open('Chess AI/data/files/scores.p', 'rb'))
+
+# We have all of the values we need to plug it into the AI now, but the next steps would to be ranking every move at some point, instead we are taking the wins of the highest up people as excellent moves

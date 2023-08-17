@@ -54,21 +54,6 @@ X = pickle.load(open('Chess AI/data/X_values.pkl', 'rb'))
 # X now contains the board states for each move, and we need to change the X to contain board states with previous moves and Y to contain the next move
 
 
-# Create a new list of X and y values
-X = []
-y = []
-
-# Iterate through the X and y values and add them to the new lists
-for i in range(len(X)):
-    temp_X, temp_y = dissect_boards(X[i])
-    X.append(X)
-    y.append(y)
-    print(i)
-
-print(new_X[1][0][0])
-print(new_y[1])
-
-
 # Now we need to pad the X values to make them all the same size
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 
