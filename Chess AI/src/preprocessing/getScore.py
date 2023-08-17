@@ -1,7 +1,7 @@
 import pandas as pd
 
 # Read the data
-data = pd.read_csv('Chess AI/temp.csv')
+data = pd.read_csv('Chess AI/data/files/temp.csv')
 
 # Extract the userful data into X and y
 X = data[['WhiteElo', 'BlackElo',  'Termination', 'WhiteRatingDiff', 'BlackRatingDiff']]
