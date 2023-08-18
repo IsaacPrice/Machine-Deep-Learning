@@ -2,6 +2,7 @@ import pandas as pd
 import chess
 import chess.pgn
 from io import StringIO
+import numpy as np
 
 # This function will take the movement string and turn it into a list of the boards after every move
 def get_boards_from_movetext(chess_data_string):
@@ -29,18 +30,18 @@ def get_boards_from_movetext(chess_data_string):
 
 # This is the dictionary for each letter to convert each thingie to
 piece_mapping = {
-    'P': .1,  # White pawn
-    'p': -.1, # Black pawn
-    'N': .2,  # White knight
-    'n': -.2, # Black knight
-    'B': .3,  # White bishop
-    'b': -.3, # Black bishop
-    'R': .4,  # White rook
-    'r': -.4, # Black rook
-    'Q': .5,  # White queen
-    'q': -.5, # Black queen
-    'K': .6,  # White king
-    'k': -.6, # Black king
+    'P': .05,  # White pawn
+    'p': .5, # Black pawn
+    'N': .1,  # White knight
+    'n': .55, # Black knight
+    'B': .15,  # White bishop
+    'b': .6, # Black bishop
+    'R': .2,  # White rook
+    'r': .65, # Black rook
+    'Q': .25,  # White queen
+    'q': .7, # Black queen
+    'K': .3,  # White king
+    'k': .75, # Black king
     'None': 0 # Empty square
 }
 # This function will turn the board into numeric data
@@ -81,7 +82,7 @@ def dissect_boards(board_list):
             if i - j >= 0:
                 temp_X.append(board_list[i - j])
             else: 
-                pass # We actually won't add anything to the list, and will be padded later on
+                temp_X.append(0.)
         
         # This will add the next move to the y list
         if i + 1 < len(board_list):
@@ -101,5 +102,22 @@ def dissect_boards(board_list):
         X.append(temp_X)
         y.append(temp_y)
 
+# This function will take a list of boards (previous 5 moves) and the key value and will return the boards seperated
+def get_X_y(boards, key):
+    # This will get the 5th, 4th, 3rd, 2nd, and 1st moves
+    fifth = boards[0]
+    fourth = boards[1]
+    third = boards[2]
+    second = boards[3]
+    first = boards[4]
 
-# Function
+    # This will get the next move
+    next_move = key
+
+    return fifth, fourth, third, second, first, next_move
+
+# This function will take a board of 8x8 size and turn it into a single list of 64 values
+def preprocess_boards(boards):
+    # Flatten each board and concatenate the last 5
+    processed_boards = [np.concatenate([board.flatten() for board in boards[i-5:i]]) for i in range(5, len(boards) + 1)]
+    return np.array(processed_boards)
