@@ -18,18 +18,14 @@ from tensorflow.keras.layers import Conv2D, MaxPooling2D
 from tensorflow.keras.layers import Flatten, Dense
 from tensorflow.keras.layers import Masking
 
-# Add the layers
-model.add(Conv2D(filters=32, kernel_size=(3,3), activation='relu', input_shape=(5890, 5, 8, 8)))
-model.add(Flatten())
+model = keras.Sequential()
+model.add(Dense(256, activation='relu', input_shape=(1, 320))) # Input shape reflects flattened 5 boards
 model.add(Dense(128, activation='relu'))
 model.add(Dense(64, activation='relu'))
-model.add(Dense(64, activation='relu'))
-model.add(Dense(64, activation='relu'))
-model.add(Dense(64, activation='relu'))
-model.add(Dense(1, activation='softmax')) # Adjust output_size to match y
+model.add(Dense(64, activation='linear')) # 64 units to match flattened 8x8 target board
 
 # Compile the model
-model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+model.compile(optimizer='adam', loss='mse', metrics=['accuracy']) # Mean squared error for a regression problem
 
 # Fit the model
 model.fit(X, y, epochs=10)

@@ -65,42 +65,32 @@ def convert_board_to_numeric(boards):
 
 # This function will take the board of moves, and then will return a list of the board states with the previous moves, with a seperate value of the next move
 def dissect_boards(board_list):
-    # Initialize a list to store the dissected boards
-    X = [] # This will contain a the lists, which each has the last 5 moves
+    X = [] # This will contain the lists, which each has the last 5 moves
     y = [] # This will contain the next move
 
-    temp_X = [] # This will contain the last 5 moves
-    temp_y = 0 # This will contain the next move
-
-    # Iterate through the boards
-    for i in range(len(board_list)):
+    # Iterate through the boards starting from index 5 (the 6th board)
+    # so that we always have exactly 5 previous moves
+    for i in range(5, len(board_list)):
         temp_X = []
-        temp_y = 0 
 
-        # This will loop through the last 5 moves and add them to the list as long as it exists
+        # This will loop through the last 5 moves and add them to the list
         for j in range(5):
-            if i - j >= 0:
-                temp_X.append(board_list[i - j])
-            else: 
-                temp_X.append(0.)
-        
+            temp_X.append(board_list[i - j - 1])
+
         # This will add the next move to the y list
         if i + 1 < len(board_list):
             temp_y = board_list[i + 1]
         else:
-            # This means that the game is over, and we will assingn the last move to the y value
+            # This means that the game is over, and we will assign the last move to the y value
             temp_y = board_list[i]
-
-            # Add the temp lists to the main lists
-            X.append(temp_X)
-            y.append(temp_y)
-
-            # Return the lists
-            return X, y
 
         # Add the temp lists to the main lists
         X.append(temp_X)
         y.append(temp_y)
+
+    # Return the lists
+    return X, y
+
 
 # This function will take a list of boards (previous 5 moves) and the key value and will return the boards seperated
 def get_X_y(boards, key):
@@ -116,8 +106,10 @@ def get_X_y(boards, key):
 
     return fifth, fourth, third, second, first, next_move
 
-# This function will take a board of 8x8 size and turn it into a single list of 64 values
 def preprocess_boards(boards):
-    # Flatten each board and concatenate the last 5
-    processed_boards = [np.concatenate([board.flatten() for board in boards[i-5:i]]) for i in range(5, len(boards) + 1)]
+    # Convert each board to a numpy array, flatten, and concatenate the last 5
+    processed_boards = [np.concatenate([np.array(board).flatten() for board in boards[i-5:i]]) for i in range(5, len(boards) + 1)]
     return np.array(processed_boards)
+
+def preprocess_target_boards(target_boards):
+    return np.array([np.array(board).flatten() for board in target_boards])
