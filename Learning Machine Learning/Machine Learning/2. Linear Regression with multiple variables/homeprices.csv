@@ -1,6 +1,3 @@
-area,bedrooms,age,price
-2600,3,20,550000
-3000,4,15,565000
-3200,3,18,610000
-3600,3,30,595000
-4000,5,8,760000
+version https://git-lfs.github.com/spec/v1
+oid sha256:0dc15d004f60bffc06ace83cb0733d1a0558e35e2bf60ed19ad5682f0dfbd22c
+size 112
