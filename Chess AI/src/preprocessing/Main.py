@@ -21,36 +21,28 @@ features = { # This will be a dictionary of the features that we want to keep, a
     'Termination': ['Termination'],
     'Result': ['Result']
 }
+top_percent = 1
 
 # This will run and combine all of the csv files if there are multiple
-if len(csv_names) > 1:
-    data = combine_data(path, csv_names, movetext_column_names, features)
-else: 
-    data = read_rename(path, csv_names[0], movetext_column_names, features)
+data = get_data(path, csv_names, movetext_column_names, features)
 
+# Create and move the progress bar
 bar = ProgressBar(50, 50)
 bar.smooth_update(5)
-
-# Now we will give a score to each game
-data = get_score(data)
-bar.smooth_update(10)
-
-# For now, we will just train the data on the top games. This can be changed later to the movements from the stockfish engine combined with the top games to make the AI better
-data = select_top_games(data)
-bar.smooth_update(20)
 
 # Parse the movetext into a list of boards
 data['Boards'] = data['MoveText'].apply(get_boards_from_movetext)
 bar.smooth_update(25)
 
-# !!! STOCKFISH STUFF GOES HERE !!!
+# Rotate the boards
+data['Boards'] = data['Boards'].apply(rotate_board)
 
 # Get rid of all the columns we don't need anymore
 get_rid = ['WhiteRank', 'BlackRank', 'MoveText', 'Termination', 'Result', 'WhiteWinScore', 'BlackWinScore']
 data = data.drop(get_rid, axis='columns')
 bar.smooth_update(30)
 
-# !!! IF NEEDED ACCURACY, HERE ONLY CHOOSE THE TOP WINSCORES !!!
+
 
 # Turn the boards into numerical data
 data['Boards'] = data['Boards'].apply(convert_board_to_numeric)
